@@ -3,9 +3,9 @@
  * Fired when the plugin is uninstalled.
  */
 
-// If uninstall not called from WordPress, then exit
+// if uninstall.php is not called by WordPress, die
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-    exit;
+    die;
 }
 
-// @TODO: Define uninstall functionality here
+// @TODO: Define uninstall functionality here: https://developer.wordpress.org/plugins/plugin-basics/uninstall-methods/

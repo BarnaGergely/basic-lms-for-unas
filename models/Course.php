@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class Course
+ *
+ * Represents a course with its product number, role, and title.
+ */
 
 class Course {
     public string $product_number;

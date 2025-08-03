@@ -3,52 +3,62 @@
 /**
  * Plugin Name:     Basic LMS with UNAS
  * Plugin URI:      https://TODO:
- * Description:     Basic LMS with automatic user management from UNAS
+ * Description:     Basic custom LMS with automatic user management from UNAS
  * Author:          GergelyBarna
  * Author URI:      https://mediterranfarm.hu
  * Text Domain:     basic-lms-for-unas
  * Domain Path:     /languages
  * Version:         0.1.0
  *
- * @package         Basic_Lms_For_Unas
+ * @package         basic_lms_for_unas
  */
-
-// TODO: simple register example: https://github.com/kamerpower/login-registration-wp-plugin/tree/master
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Store the plugin's version
-define('UNASLMS_VERSION', '0.1.0');
-
-// Api key for UNAS API from Beállítások / Külső kapcsolatok / API kapcsolat
-const API_KEY = 'a8de627d72160ca44f8194e0e1cdf12d92dc90dd';
-
 // Include required model classes
 require_once __DIR__ . '/models/Course.php';
 
-// Avaliable courses product numbers, role numbers, and course names
-const COURSES = [
+// Api key for UNAS API from Beállítások / Külső kapcsolatok / API kapcsolat
+const UNASLMS_API_KEY = 'a8de627d72160ca44f8194e0e1cdf12d92dc90dd';
+
+// Available courses and their associated roles
+// Parameters:
+// The courses Product Number (Sku) from UNAS, 
+// Role ID from WordPress > Ultimate Members > User Roles, 
+// Course Title
+const UNASLMS_COURSES = [
     new Course('UNASLMS-1', 'unaslms_course_1', 'UNAS LMS Course 1'),
     new Course('UNASLMS-2', 'unaslms_course_2', 'UNAS LMS Course 2'),
     new Course('product_587', 'kurzus1', 'Kurzus 1'),
 ];
 
-add_shortcode('showcourses', function () {
-    return '<h2>Elérhető tanfolyamok</h2>';
-});
+const UNASLMS_DEBUG = false; // Set to false in production
 
+// Store the plugin's version
+define('UNASLMS_VERSION', '0.1.0');
+
+function unaslms_activate() {
+    // Do something
+}
+register_activation_hook(__FILE__, 'unaslms_activate');
+
+function unaslms_deactivate() {
+    // Do something
+}
+register_deactivation_hook(__FILE__, 'unaslms_deactivate');
+
+// Run this method after WordPress has finished loading but before any headers are sent
 add_action('init', function () {
-    // Ensure the plugin is only activated on the activation page
+
+    // Ensure the plugin is only activated on the /activate page
     if (!(isset($_SERVER['REQUEST_URI']) && rtrim($_SERVER['REQUEST_URI'], '/') === '/activate')) {
         return;
     }
 
-    $debug = true; // Set to false in production
-
-    // iput variables
+    // HTTP input variables
     $request_method = $_SERVER['REQUEST_METHOD'];
     $reg_email = $_POST['reg_email'] ?? null; // The email submitted by the user
     $pass = $_POST['pwd'] ?? null; // If the user is already registered, they might submit a password
@@ -62,7 +72,7 @@ add_action('init', function () {
         // TODO: error handling
         exit;
 
-        // Email submitted but not logged in
+        // Email submitted but not logged in state
     } else if (
         $request_method === 'POST'
         && isset($reg_email)
@@ -72,7 +82,7 @@ add_action('init', function () {
         && empty($pass2)
         && !is_user_logged_in()
     ) {
-        if (!$debug) {
+        if (!UNASLMS_DEBUG) {
             $items = get_course_items_from_UNAS($reg_email);
             if (is_string($items)) {
                 echo $items;
@@ -90,10 +100,9 @@ add_action('init', function () {
             exit;
         }
 
-        // TODO: redirect back to this page after login
         // TODO: customize login URL and page
 
-        // User is logged in
+        // User is logged in state
     } else if (
         $request_method === 'POST'
         && isset($reg_email)
@@ -127,7 +136,7 @@ add_action('init', function () {
         $added_courses = [];
         foreach ($items as $item) {
             // find the course by product number
-            $course = array_filter(COURSES, function ($course) use ($item) {
+            $course = array_filter(UNASLMS_COURSES, function ($course) use ($item) {
                 return $course->product_number === $item->Sku;
             });
             if (empty($course)) {
@@ -160,6 +169,9 @@ add_action('init', function () {
     exit;
 });
 
+/**
+ * Display the email form
+ */
 function email_form() {
 ?>
     <form method="post">
@@ -181,17 +193,19 @@ function get_course_items_from_UNAS($reg_email) {
     if (empty($reg_email))
         return 'Hiba: az email cím nem lehet üres.';
 
-    $token = unas_login(API_KEY);
+    $token = unas_login(UNASLMS_API_KEY);
     if (!isset($token) || empty($token)) {
         return 'Hiba: nem sikerült bejelentkezni a webáruház API-jába.';
     }
 
     $orders = get_orders_by_email($reg_email, $token);
-    if (!isset($orders) || empty($orders) || !isset($orders->Order) || empty($orders->Order)) {
+    if (is_string($orders)) {
+        return $orders; // Return the error message if there was an error
+    } else if (!isset($orders) || empty($orders) || !isset($orders->Order) || empty($orders->Order)) {
         return 'Hiba: ezzel az email címmel nem vásároltak a webáruházban.';
     }
 
-    $items = find_items_by_courses($orders, COURSES);
+    $items = find_items_by_courses($orders, UNASLMS_COURSES);
     if (!isset($items) || empty($items)) {
         return 'Hiba: ezzel az email címmel nem vásároltak kurzust.';
     }
@@ -199,6 +213,12 @@ function get_course_items_from_UNAS($reg_email) {
     return $items;
 }
 
+/**
+ * Log in to the UNAS API
+ *
+ * @param string $apiKey UNAS API key
+ * @return string|null The API token if successful, or null if not
+ */
 function unas_login($apiKey) {
     $request = '<?xml version="1.0" encoding="UTF-8" ?>
         <Params>
@@ -215,8 +235,7 @@ function unas_login($apiKey) {
     );
 
     if (is_wp_error($response)) {
-        echo 'Hiba: nem sikerült csatlakozni a webáruház API-jához.';
-        exit;
+        return null; // Return null if there was an error
     }
 
     $xml = simplexml_load_string(wp_remote_retrieve_body($response));
@@ -224,6 +243,13 @@ function unas_login($apiKey) {
     return $token;
 }
 
+/**
+ * Get orders by email from UNAS API
+ *
+ * @param string $email The email address to search for
+ * @param string $token The UNAS API token for authentication
+ * @return Orders|string Orders object if successful, or an error message if not
+ */
 function get_orders_by_email($email, $token) {
     $headers = array(
         'Content-Type' => 'application/xml',
@@ -244,8 +270,7 @@ function get_orders_by_email($email, $token) {
     );
 
     if (is_wp_error($get_order_response)) {
-        echo 'Hiba: nem sikerült lekérni a rendeléseket.';
-        exit;
+        return 'Hiba: nem sikerült lekérni a rendeléseket.';
     }
 
     $orders_xml = wp_remote_retrieve_body($get_order_response);
@@ -256,6 +281,14 @@ function get_orders_by_email($email, $token) {
     return $orders_obj;
 }
 
+
+/**
+ * Find items by courses from orders
+ *
+ * @param Orders $orders The orders object containing order data
+ * @param array<Course> $courses Array of Course objects to match against
+ * @return array<Item> Array of items that match the courses
+ */
 function find_items_by_courses($orders, $courses) {
     $items = [];
 
@@ -272,10 +305,6 @@ function find_items_by_courses($orders, $courses) {
         }
     }
     return $items;
-}
-
-function unaslms_activate() {
-    // Do something
 }
 
 /**
@@ -299,10 +328,3 @@ function um_121721_change_registration_role($user_id) {
     wp_redirect($url);
     exit;
 }
-
-register_activation_hook(__FILE__, 'unaslms_activate');
-
-function unaslms_deactivate() {
-    // Do something
-}
-register_deactivation_hook(__FILE__, 'unaslms_deactivate');

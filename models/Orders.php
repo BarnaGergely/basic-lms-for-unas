@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class Orders
+ *
+ * Represents and serializes from XML a collection of orders retrieved from the UNAS API.
+ */
 
 class Orders
 {

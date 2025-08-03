@@ -34,9 +34,9 @@ const UNASLMS_API_KEY = 'YOUR_SECRET_API_KEY';
 // Role ID from WordPress > Ultimate Members > User Roles, 
 // Course Title
 const UNASLMS_COURSES = [
-    new Course('UNASLMS-1', 'unaslms_course_1', 'UNAS LMS Course 1'),
-    new Course('UNASLMS-2', 'unaslms_course_2', 'UNAS LMS Course 2'),
-    new Course('product_587', 'kurzus1', 'Kurzus 1'),
+    new Course('UNASLMS-1', 'unaslms_course_1', 'UNAS LMS Course 1', 'https://example.com/course-1'),
+    new Course('UNASLMS-2', 'unaslms_course_2', 'UNAS LMS Course 2', 'https://example.com/course-2'),
+    new Course('product_587', 'kurzus1', 'Kurzus 1', 'https://example.com/kurzus-1'),
 ];
 
 /*********************************************************************************/
@@ -66,6 +66,13 @@ add_action('init', function () {
         return;
     }
 
+    // TODO: fix this
+    // Enqueue the CSS file for the activate page
+    add_action('wp_enqueue_scripts', function () {
+        wp_register_style( 'basic-lms-for-unas', plugins_url( 'basic-lms-for-unas.css', __FILE__ ) );
+        wp_enqueue_style( 'basic-lms-for-unas' );
+    });
+
     // HTTP input variables
     $request_method = $_SERVER['REQUEST_METHOD'];
     $reg_email = $_POST['reg_email'] ?? null; // The email submitted by the user
@@ -73,106 +80,128 @@ add_action('init', function () {
     $pass1 = $_POST['reg_pass1'] ?? null; // For new registrations
     $pass2 = $_POST['reg_pass2'] ?? null; // For new registrations
 
+    // Page structure and container
+?>
+    <div class="unaslms container">
+        <h1>Kurzus aktiválása</h1>
+        <?php
 
-    // Initial state (no data submitted)
-    if (($request_method !== 'POST' || empty($reg_email))) {
-        email_form();
-        // TODO: error handling
-        exit;
 
-        // Email submitted but not logged in state
-    } else if (
-        $request_method === 'POST'
-        && isset($reg_email)
-        && !empty($reg_email)
-        && empty($pass)
-        && empty($pass1)
-        && empty($pass2)
-        && !is_user_logged_in()
-    ) {
-        if (!UNASLMS_DEBUG) {
-            $items = get_course_items_from_UNAS($reg_email);
+        // Initial state (no data submitted)
+        if (($request_method !== 'POST' || empty($reg_email))) {
+            email_form();
+            // TODO: error handling
+            exit;
+
+            // Email submitted but not logged in state
+        } else if (
+            $request_method === 'POST'
+            && isset($reg_email)
+            && !empty($reg_email)
+            && empty($pass)
+            && empty($pass1)
+            && empty($pass2)
+            && !is_user_logged_in()
+        ) {
+            if (!UNASLMS_DEBUG) {
+                $items = get_course_items_from_UNAS($reg_email);
+                if (is_string($items)) {
+                    echo $items;
+                    exit;
+                }
+            }
+
+            if (email_exists($reg_email) === false) {
+                // Email doesn't exist, redirect to ultimate member registration
+        ?>
+                <p>Ahhoz hogy bármikor biztonságosan hozzá férhess a kurzusaidhoz, kérlek regisztrálj.</p>
+                <button type="button" onclick="location.href='<?php echo esc_url(um_get_core_page('register')); ?>'">Regisztráció</button>
+            <?php
+                exit;
+            } else {
+                // Email exists, redirect to WordPress login
+            ?>
+                <p>Ahhoz hogy hozzá férhess a kurzusaidhoz, kérlek jelentkezz be.</p>
+                <button type="button" onclick="location.href='<?php echo esc_url(um_get_core_page('login')); ?>'">Bejelentkezés</button>
+            <?php
+                exit;
+            }
+
+
+            // User is logged in state
+        } else if (
+            $request_method === 'POST'
+            && isset($reg_email)
+            && !empty($reg_email)
+            && is_user_logged_in()
+        ) {
+            // logged in with wrong user
+            $user = wp_get_current_user();
+            if ($user->user_email !== $reg_email) {
+                echo '<p>Hiba: a bejelentkezett felhasználó email címe nem egyezik a megadott email címmel.</p>';
+                // bejelentkezés másik felhasználóként
+                wp_logout();
+                echo '<p>Kérem jelentkezzen be újra azzal az email címmel, amivel a tanfolyamot megvásárolta.</p>';
+                // bejelentkezés gomb
+                echo '<button type="button" onclick="location.href=\'' . esc_url(um_get_core_page('login')) . '\'">Bejelentkezés</button>';
+                exit;
+            }
+
+            // logged in with the correct email
+            $items = get_course_items_from_UNAS($user->user_email);
             if (is_string($items)) {
                 echo $items;
                 exit;
             }
-        }
 
-        if (email_exists($reg_email) === false) {
-            // Email doesn't exist, redirect to ultimate member registration
-            wp_safe_redirect(um_get_core_page('register'));
-            exit;
-        } else {
-            // Email exists, redirect to WordPress login
-            wp_safe_redirect(um_get_core_page('login'));
-            exit;
-        }
+            // Debug: show the items
+            echo '<h3>Debug - Found items:</h3>';
+            echo '<pre>' . print_r($items, true) . '</pre>';
 
-        // TODO: customize login URL and page
-
-        // User is logged in state
-    } else if (
-        $request_method === 'POST'
-        && isset($reg_email)
-        && !empty($reg_email)
-        && is_user_logged_in()
-    ) {
-        // logged in with wrong user
-        $user = wp_get_current_user();
-        if ($user->user_email !== $reg_email) {
-            echo 'Hiba: a bejelentkezett felhasználó email címe nem egyezik a megadott email címmel.';
-            // bejelentkezés másik felhasználóként
-            wp_logout();
-            echo 'Kérem jelentkezzen be újra azzal az email címmel, amivel a tanfolyamot megvásárolta.';
-            // bejelentkezés gomb
-            echo '<button type="button" onclick="location.href=\'' . esc_url(um_get_core_page('login')) . '\'">Bejelentkezés</button>';
-            exit;
-        }
-
-        // logged in with the correct email
-        $items = get_course_items_from_UNAS($user->user_email);
-        if (is_string($items)) {
-            echo $items;
-            exit;
-        }
-
-        // Debug: show the items
-        echo '<h3>Debug - Found items:</h3>';
-        echo '<pre>' . print_r($items, true) . '</pre>';
-
-        $errors = [];
-        $added_courses = [];
-        foreach ($items as $item) {
-            // find the course by product number
-            $course = array_filter(UNASLMS_COURSES, function ($course) use ($item) {
-                return $course->product_number === $item->Sku;
-            });
-            if (empty($course)) {
-                $errors[] = 'Hiba: a megadott cikkszámokhoz nem található tétel.';
-            } else {
-                $course_found = array_values($course)[0]; // Get the first element from filtered array
-                $course_role = $course_found->role;
-                if (!user_can($user->ID, $course_role)) {
-                    $user->add_role($course_role);
-                    $added_courses[] = $course_found;
+            $errors = [];
+            $added_courses = [];
+            foreach ($items as $item) {
+                // find the course by product number
+                $course = array_filter(UNASLMS_COURSES, function ($course) use ($item) {
+                    return $course->product_number === $item->Sku;
+                });
+                if (empty($course)) {
+                    $errors[] = 'Hiba: a megadott cikkszámokhoz nem található tétel.';
+                } else {
+                    $course_found = array_values($course)[0]; // Get the first element from filtered array
+                    $course_role = $course_found->role;
+                    if (!user_can($user->ID, $course_role)) {
+                        $user->add_role($course_role);
+                        $added_courses[] = $course_found;
+                    }
                 }
             }
-        }
 
-        if (!empty($errors)) {
-            echo implode('<br>', $errors);
-        } else {
-            echo 'Az alábbi kurzusok hozzáadva: ';
-            foreach ($added_courses as $course) {
-                echo '<br>' . esc_html($course->title);
+            if (!empty($errors)) {
+                echo implode('<br>', $errors);
+            } else {
+            ?>
+                <h2>Az alábbi kurzusok hozzáadva:</h2>
+                <?php
+                foreach ($added_courses as $course) {
+                ?>
+                    <div>
+                        <h3><?php echo esc_html($course->title); ?></h3>
+                        <p><a href="<?php echo esc_url($course->url); ?>">Kurzus link</a></p>
+                    </div>
+        <?php
+                }
             }
+
+            // Error state
+        } else {
+            echo 'Hiba: érvénytelen kérés.';
+            exit;
         }
 
-        // Error state
-    } else {
-        echo 'Hiba: érvénytelen kérés.';
-        exit;
-    }
+        ?>
+    </div>
+<?php
 
     exit;
 });
@@ -182,6 +211,9 @@ add_action('init', function () {
  */
 function email_form() {
 ?>
+    <p>Ezen az oldalon fogod tudni elérni a Mediterranfarm webáruházban vásárolt kurzusaidat.</p>
+    <p>Kérjük add meg az email címet, amivel megvásároltad valamelyik kurzusunkat.</p>
+    <p>Itt tudsz új kurzusokat vásárolni: <a href="https://www.mediterranfarm.hu/">kurzusaink</a></p>
     <form method="post">
         <label for="reg_email">Email cím:</label>
         <input type="email" name="reg_email" id="reg_email" required>

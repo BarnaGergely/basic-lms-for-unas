@@ -1,0 +1,7 @@
+.unaslms, .container {
+    color: red;
+}
+
+* {
+    color: red !important;
+}

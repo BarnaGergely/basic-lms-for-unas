@@ -3,7 +3,7 @@
 /**
  * Plugin Name:     Basic LMS with UNAS
  * Plugin URI:      https://TODO:
- * Description:     Basic custom LMS with automatic user management from UNAS
+ * Description:     Basic custom LMS with automatic user management for UNAS
  * Author:          GergelyBarna
  * Author URI:      https://mediterranfarm.hu
  * Text Domain:     basic-lms-for-unas

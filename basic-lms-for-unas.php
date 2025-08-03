@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name:     Basic LMS with UNAS
+ * Plugin Name:     Basic LMS for UNAS
  * Plugin URI:      https://TODO:
  * Description:     Basic custom LMS with automatic user management for UNAS
  * Author:          GergelyBarna

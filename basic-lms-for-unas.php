@@ -26,7 +26,7 @@ require_once __DIR__ . '/models/Course.php';
 /****************************** EZT KERESED ***************************************/
 
 // Api key for UNAS API from Beállítások / Külső kapcsolatok / API kapcsolat
-const UNASLMS_API_KEY = 'a8de627d72160ca44f8194e0e1cdf12d92dc90dd';
+const UNASLMS_API_KEY = 'YOUR_SECRET_API_KEY';
 
 // Available courses and their associated roles
 // Parameters:

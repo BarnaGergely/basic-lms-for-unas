@@ -1,115 +1,149 @@
-=== Basic LMS with UNAS ===
-Contributors: (this should be a list of wordpress.org userid's)
-Donate link: https://example.com/
-Tags: comments, spam
-Requires at least: 4.5
-Tested up to: 6.7.1
-Requires PHP: 5.6
+=== Basic LMS for UNAS ===
+Contributors: gergelybarna
+Donate link: https://mediterranfarm.hu/
+Tags: lms, learning management, unas, e-commerce, courses, user management, automatic enrollment
+Requires at least: 6.0
+Tested up to: 6.8.2
+Requires PHP: 7.4
 Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Basic custom LMS with automatic user management and course enrollment based on UNAS e-commerce purchases.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Basic LMS for UNAS is a WordPress plugin that provides learning management system functionality with automatic user management through integration with the UNAS e-commerce API. The plugin enables seamless course enrollment based on product purchases from a UNAS webshop, automatically managing user registration, login, and role assignment.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+= Key Features =
 
-A few notes about the sections above:
+* **Automatic Course Enrollment**: Users are automatically enrolled in courses based on their UNAS webshop purchases
+* **Seamless User Management**: Integration with WordPress user system and Ultimate Member plugin
+* **Role-Based Access Control**: Automatic assignment of WordPress user roles for course access
+* **UNAS API Integration**: Secure connection to UNAS e-commerce platform via XML API
+* **Hungarian Language Support**: User interface in Hungarian language
+* **Email-Based Verification**: Course enrollment verification through email addresses used for purchases
 
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
+= How It Works =
 
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
+1. User enters their email address on the `/activate` page
+2. Plugin checks UNAS API for purchases associated with that email
+3. If courses are found in purchase history, user is guided through registration/login
+4. Upon successful authentication, appropriate course roles are automatically assigned
+5. User gains access to purchased courses based on their WordPress user role
 
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+= Technical Requirements =
+
+* WordPress 5.0 or higher
+* PHP 7.4 or higher
+* Ultimate Member plugin for user management
+* Active UNAS webshop with API access
+* UNAS API key configured in plugin constants
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
+1. Upload the `basic-lms-for-unas` folder to the `/wp-content/plugins/` directory
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Install and configure the Ultimate Member plugin
+4. Configure your UNAS API key in the plugin file (`UNASLMS_API_KEY` constant)
+5. Set up your courses in the `UNASLMS_COURSES` constant with:
+   - UNAS product SKU/number
+   - WordPress user role name
+   - Course title
+6. Create a page with the slug `/activate` where users can enter their email
+7. Configure Ultimate Member registration and login pages
 
-e.g.
+== Configuration ==
 
-1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
+= Setting Up Courses =
+
+Edit the `UNASLMS_COURSES` constant in the main plugin file:
+
+```php
+const UNASLMS_COURSES = [
+    new Course('PRODUCT_SKU', 'wordpress_role', 'Course Title'),
+    // Add more courses as needed
+];
+```
+
+= UNAS API Setup =
+
+1. Log into your UNAS admin panel
+2. Go to Beállítások / Külső kapcsolatok / API kapcsolat
+3. Copy your API key
+4. Update the `UNASLMS_API_KEY` constant in the plugin file
+
+= WordPress Roles =
+
+Create custom user roles in WordPress (via Ultimate Member or other plugins) that correspond to your courses. Each course should have its own role for proper access control.
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= Do I need a UNAS webshop to use this plugin? =
 
-An answer to that question.
+Yes, this plugin is specifically designed to work with UNAS e-commerce platforms. You need an active UNAS webshop with API access enabled.
 
-= What about foo bar? =
+= Which plugins are required? =
 
-Answer to foo bar dilemma.
+The Ultimate Member plugin is required for user registration and login functionality. The plugin integrates with Ultimate Member's user management system.
+
+= Can I customize the user interface? =
+
+The plugin provides basic forms and messages in Hungarian. You can customize the interface by modifying the plugin functions or using WordPress hooks and filters.
+
+= How secure is the UNAS API integration? =
+
+The plugin uses secure HTTPS connections, token-based authentication, and WordPress's built-in HTTP API for all communications with UNAS servers.
+
+= Can users access multiple courses? =
+
+Yes, users can have multiple course roles assigned automatically based on their purchase history from the UNAS webshop.
+
+= What happens if a user's email doesn't match any purchases? =
+
+The plugin will display an error message indicating that no purchases were found for that email address.
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Email input form on the activation page
+2. Course enrollment confirmation screen
+3. WordPress admin showing automatically assigned user roles
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
+= 0.1.0 =
+* Initial release
+* Basic UNAS API integration
+* Automatic user registration and login workflow
+* Course role assignment based on product purchases
+* Ultimate Member integration
+* Hungarian language interface
+* Email-based course verification
+* Debug mode for development
 
 == Upgrade Notice ==
 
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
+= 0.1.0 =
+Initial release of Basic LMS with UNAS plugin. Provides automatic course enrollment based on UNAS e-commerce purchases.
 
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
+== Developer Information ==
 
-== Arbitrary section ==
+= Constants =
 
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
+* `UNASLMS_API_KEY`: Your UNAS API key
+* `UNASLMS_COURSES`: Array of Course objects defining available courses
+* `UNASLMS_DEBUG`: Set to true for debug mode (default: false)
+* `UNASLMS_VERSION`: Plugin version
 
-== A brief Markdown Example ==
+= Main Functions =
 
-Ordered list:
+* `get_course_items_from_UNAS($email)`: Retrieves purchased course items for an email
+* `unas_login($apiKey)`: Authenticates with UNAS API
+* `get_orders_by_email($email, $token)`: Fetches orders from UNAS API
+* `find_items_by_courses($orders, $courses)`: Matches purchased items with defined courses
 
-1. Some feature
-1. Another feature
-1. Something else about the plugin
+= Hooks and Actions =
 
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](https://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: https://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+* Uses `init` action for main plugin functionality
+* Integrates with Ultimate Member registration completion
+* Custom redirect filters for seamless user experience

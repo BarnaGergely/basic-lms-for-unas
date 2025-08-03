@@ -21,6 +21,10 @@ if (!defined('ABSPATH')) {
 // Include required model classes
 require_once __DIR__ . '/models/Course.php';
 
+
+
+/****************************** EZT KERESED ***************************************/
+
 // Api key for UNAS API from Beállítások / Külső kapcsolatok / API kapcsolat
 const UNASLMS_API_KEY = 'a8de627d72160ca44f8194e0e1cdf12d92dc90dd';
 
@@ -34,6 +38,10 @@ const UNASLMS_COURSES = [
     new Course('UNASLMS-2', 'unaslms_course_2', 'UNAS LMS Course 2'),
     new Course('product_587', 'kurzus1', 'Kurzus 1'),
 ];
+
+/*********************************************************************************/
+
+
 
 const UNASLMS_DEBUG = false; // Set to false in production
 

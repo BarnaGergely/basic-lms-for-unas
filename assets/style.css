@@ -1,0 +1,193 @@
+/**
+ * Basic LMS for UNAS Styles
+ * Version: 0.1.0
+ */
+
+.unaslms.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.unaslms .activation-wrapper {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.unaslms h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 1s ease-out;
+    color: white;
+}
+
+.unaslms h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.unaslms h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.unaslms p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.unaslms .activation-wrapper p {
+    color: rgba(255, 255, 255, 0.9);
+    animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.unaslms form {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 2rem;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.unaslms label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.unaslms input[type="email"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+.unaslms button {
+    background: #ffffff;
+    color: #667eea;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.unaslms button:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.unaslms .course-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.unaslms .course-item h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.unaslms .course-item a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.unaslms .course-item a:hover {
+    text-decoration: underline;
+}
+
+.unaslms .error {
+    background: #ff6b6b;
+    color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.unaslms .success {
+    background: #51cf66;
+    color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.unaslms pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .unaslms.container {
+        padding: 1rem;
+    }
+    
+    .unaslms .activation-wrapper {
+        padding: 2rem 1rem;
+    }
+    
+    .unaslms h1 {
+        font-size: 2rem;
+    }
+    
+    .unaslms form {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .unaslms h1 {
+        font-size: 1.6rem;
+    }
+    
+    .unaslms p {
+        font-size: 1rem;
+    }
+    
+    .unaslms form {
+        padding: 1rem;
+    }
+}

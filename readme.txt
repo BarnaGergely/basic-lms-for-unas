@@ -17,20 +17,33 @@ Basic LMS for UNAS is a WordPress plugin that provides learning management syste
 
 = Key Features =
 
+* **Managed Activation Page**: Creates and manages a dedicated `/activate` WordPress page for course activation
 * **Automatic Course Enrollment**: Users are automatically enrolled in courses based on their UNAS webshop purchases
 * **Seamless User Management**: Integration with WordPress user system and Ultimate Member plugin
 * **Role-Based Access Control**: Automatic assignment of WordPress user roles for course access
 * **UNAS API Integration**: Secure connection to UNAS e-commerce platform via XML API
 * **Hungarian Language Support**: User interface in Hungarian language
 * **Email-Based Verification**: Course enrollment verification through email addresses used for purchases
+* **Page Protection**: The activation page is protected from manual editing and managed entirely by the plugin
+* **Admin Interface**: Settings page for managing plugin configuration and viewing status
 
 = How It Works =
 
-1. User enters their email address on the `/activate` page
-2. Plugin checks UNAS API for purchases associated with that email
-3. If courses are found in purchase history, user is guided through registration/login
-4. Upon successful authentication, appropriate course roles are automatically assigned
-5. User gains access to purchased courses based on their WordPress user role
+1. Plugin creates a managed WordPress page at `/activate` upon activation
+2. User visits the activation page and enters their email address
+3. Plugin checks UNAS API for purchases associated with that email
+4. If courses are found in purchase history, user is guided through registration/login
+5. Upon successful authentication, appropriate course roles are automatically assigned
+6. User gains access to purchased courses based on their WordPress user role
+
+= Page Management =
+
+The plugin creates and fully manages an activation page that:
+* Cannot be edited through the WordPress editor
+* Has protected content managed entirely by the plugin
+* Is automatically styled with included CSS
+* Shows as "LMS managed" in the pages list
+* Is automatically removed when the plugin is uninstalled
 
 = Technical Requirements =
 

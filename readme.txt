@@ -1,13 +1,13 @@
 === Basic LMS for UNAS ===
 Contributors: gergelybarna
-Donate link: https://mediterranfarm.hu/
+Donate link: https://barnagergely.hu/
 Tags: lms, learning management, unas, e-commerce, courses, user management, automatic enrollment
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
 Stable tag: 0.1.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: MIT
+License URI: https://opensource.org/license/mit
 
 Basic custom LMS with automatic user management and course enrollment based on UNAS e-commerce purchases.
 
